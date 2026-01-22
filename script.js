@@ -98,16 +98,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Portfolio card click handler
-    const portfolioCards = document.querySelectorAll('.card');
-    portfolioCards.forEach(card => {
-        card.addEventListener('click', function() {
-            const projectLink = this.querySelector('a').getAttribute('href');
-            if (projectLink && projectLink !== '#') {
-                window.open(projectLink, '_blank');
-            }
-        });
-    });
+    // Portfolio / gallery click handler
+const portfolioCards = document.querySelectorAll('.card, .gallery-item a');
+portfolioCards.forEach(card => {
+  card.addEventListener('click', function (e) {
+    const link = this.getAttribute('href') || this.querySelector('a')?.getAttribute('href');
+    if (link && link !== '#') {
+      e.preventDefault();
+      window.open(link, '_blank');
+    }
+  });
+});
 
     // Add loading attribute to images
     document.querySelectorAll('img').forEach(img => {
@@ -125,16 +126,30 @@ document.addEventListener('DOMContentLoaded', function() {
     setTheme(savedTheme);
 });
 
+
 // Intersection Observer for scroll animations
-const observer = new IntersectionObserver((entries) => {
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
     });
-}, {
-    threshold: 0.1
-});
+  }, {
+    threshold: 0.15
+  });
+
+  document.querySelectorAll('section').forEach((section) => {
+    observer.observe(section);
+  });
+} else {
+  // Fallback for older browsers
+  document.querySelectorAll('section').forEach((section) => {
+    section.classList.add('visible');
+  });
+}
+
 
 // Observe all sections
 document.querySelectorAll('section').forEach((section) => {
